@@ -1,0 +1,26 @@
+{
+	"name": "@agent/apps-api",
+	"version": "0.1.0",
+	"private": true,
+	"main": "dist/main.js",
+	"types": "dist/main.d.ts",
+	"scripts": {
+		"build": "tsc -p tsconfig.json",
+		"dev": "node --enable-source-maps dist/main.js"
+	},
+	"dependencies": {
+		"@agent/shared": "workspace:*",
+		"@agent/router": "workspace:*",
+		"@agent/planner": "workspace:*",
+		"@agent/providers-openai": "workspace:*",
+		"@agent/providers-openrouter": "workspace:*",
+		"@agent/providers-anthropic": "workspace:*",
+		"@agent/config": "workspace:*",
+		"@prisma/client": "^6.18.0",
+		"@nestjs/common": "^10.0.0",
+		"@nestjs/core": "^10.0.0",
+		"@nestjs/platform-express": "^10.0.0",
+		"reflect-metadata": "^0.2.2",
+		"rxjs": "^7.8.1"
+	}
+}

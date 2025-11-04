@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Run represents a plan execution session
+model Run {
+  id        String   @id @default(cuid())
+  goal      String   // Original goal/query
+  planJson  String   // JSON serialized Plan
+  status    String   // pending | running | completed | failed
+  output    String?  // Final aggregated output
+  error     String?  // Error message if failed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  steps     Step[]
+  messages  Message[]
+
+  @@map("runs")
+}
+
+// Step represents a single step in a plan execution
+model Step {
+  id          String   @id @default(cuid())
+  runId       String
+  stepId      String   // Step ID from Plan (e.g., "step_123")
+  title       String   // Step title/description
+  status      String   // pending | running | completed | failed
+  inputJson   String   // JSON serialized inputs
+  outputJson  String?  // JSON serialized output
+  error       String?  // Error message if failed
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  run         Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@map("steps")
+  @@index([runId])
+}
+
+// Message represents chat messages during execution
+model Message {
+  id        String   @id @default(cuid())
+  runId     String
+  stepId    String?  // Optional: link to specific step
+  role      String   // system | user | assistant | tool
+  content   String
+  createdAt DateTime @default(now())
+
+  run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+  @@index([runId])
+  @@index([stepId])
+}

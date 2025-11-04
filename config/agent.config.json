@@ -1,0 +1,218 @@
+{
+	"providers": {
+		"openai": {
+			"apiKeyEnv": "OPENAI_API_KEY",
+			"baseUrl": "https://api.openai.com/v1"
+		},
+		"openrouter": {
+			"apiKeyEnv": "OPENROUTER_API_KEY",
+			"baseUrl": "https://openrouter.ai/api/v1"
+		}
+	},
+	"models": [
+		{
+			"id": "gpt-5-nano",
+			"provider": "openrouter",
+			"name": "openai/gpt-5-nano",
+			"maxTokens": 128000
+		},
+		{
+			"id": "gpt-4o-mini",
+			"provider": "openrouter",
+			"name": "openai/gpt-4o-mini",
+			"maxTokens": 128000
+		},
+		{
+			"id": "claude-haiku-3",
+			"provider": "openrouter",
+			"name": "anthropic/claude-3-haiku",
+			"maxTokens": 200000
+		},
+		{
+			"id": "claude-haiku-4.5",
+			"provider": "openrouter",
+			"name": "anthropic/claude-haiku-4.5",
+			"maxTokens": 200000
+		},
+		{
+			"id": "qwen3-8b",
+			"provider": "openrouter",
+			"name": "qwen/qwen3-8b",
+			"maxTokens": 32768
+		},
+		{
+			"id": "deepseek-r1-distill-llama-70b",
+			"provider": "openrouter",
+			"name": "deepseek/deepseek-r1-distill-llama-70b",
+			"maxTokens": 64000
+		},
+		{
+			"id": "deepseek-chat",
+			"provider": "openrouter",
+			"name": "deepseek/deepseek-chat-v3.1",
+			"maxTokens": 64000
+		},
+		{
+			"id": "grok-4-fast",
+			"provider": "openrouter",
+			"name": "x-ai/grok-4-fast",
+			"maxTokens": 131072
+		},
+		{
+			"id": "grok-3-mini",
+			"provider": "openrouter",
+			"name": "x-ai/grok-3-mini",
+			"maxTokens": 131072
+		},
+		{
+			"id": "gemini-2.0-flash-lite",
+			"provider": "openrouter",
+			"name": "google/gemini-2.0-flash-lite-001",
+			"maxTokens": 1000000
+		},
+		{
+			"id": "gemini-2.5-flash-lite",
+			"provider": "openrouter",
+			"name": "google/gemini-2.5-flash-lite",
+			"maxTokens": 1000000
+		}
+	],
+	"agents": [
+		{
+			"id": "generalist-gpt",
+			"modelId": "gpt-5-nano",
+			"roles": [
+				"general",
+				"unknown"
+			],
+			"capabilities": [
+				"creative",
+				"reasoning"
+			],
+			"tools": [],
+			"systemPrompt": "You are a helpful AI assistant."
+		},
+		{
+			"id": "coding-expert",
+			"modelId": "deepseek-chat",
+			"roles": [
+				"coding",
+				"tech"
+			],
+			"capabilities": [
+				"coding",
+				"debugging",
+				"architecture"
+			],
+			"tools": [],
+			"systemPrompt": "You are an expert software engineer specializing in TypeScript, NestJS, and modern web development."
+		},
+		{
+			"id": "analyst-deepseek",
+			"modelId": "deepseek-chat",
+			"roles": [
+				"analysis",
+				"research"
+			],
+			"capabilities": [
+				"reasoning",
+				"analysis",
+				"writing"
+			],
+			"tools": [],
+			"systemPrompt": "You are an expert analyst focused on deep thinking and comprehensive research."
+		},
+		{
+			"id": "creative-gemini",
+			"modelId": "gemini-2.5-flash-lite",
+			"roles": [
+				"creative",
+				"brainstorm"
+			],
+			"capabilities": [
+				"creative",
+				"multimodal"
+			],
+			"tools": [],
+			"systemPrompt": "You are a creative AI assistant with strong multimodal capabilities."
+		},
+		{
+			"id": "fast-claude",
+			"modelId": "claude-haiku-4.5",
+			"roles": [
+				"quick",
+				"simple"
+			],
+			"capabilities": [
+				"fast",
+				"simple-tasks"
+			],
+			"tools": [],
+			"systemPrompt": "You are a quick and efficient AI assistant for simple tasks."
+		},
+		{
+			"id": "grok-assistant",
+			"modelId": "grok-4-fast",
+			"roles": [
+				"chat",
+				"conversation"
+			],
+			"capabilities": [
+				"reasoning",
+				"creative"
+			],
+			"tools": [],
+			"systemPrompt": "You are Grok, a witty and helpful AI assistant with a sense of humor."
+		},
+		{
+			"id": "budget-assistant",
+			"modelId": "gpt-4o-mini",
+			"roles": [
+				"free",
+				"budget"
+			],
+			"capabilities": [
+				"reasoning",
+				"coding"
+			],
+			"tools": [],
+			"systemPrompt": "You are a helpful AI assistant optimized for cost-effective responses."
+		}
+	],
+	"routing": {
+		"strategy": "rules",
+		"rules": [
+			{
+				"if": "(code|coding|typescript|javascript|nestjs|react|debug|refactor|programming)",
+				"routeTo": "coding-expert"
+			},
+			{
+				"if": "(analyze|research|study|investigate|compare|deep)",
+				"routeTo": "analyst-deepseek"
+			},
+			{
+				"if": "(creative|brainstorm|idea|design|story|imagine|art)",
+				"routeTo": "creative-gemini"
+			},
+			{
+				"if": "(quick|simple|fast|translate|summarize|short)",
+				"routeTo": "fast-claude"
+			},
+			{
+				"if": "(grok|witty|humor|funny|joke)",
+				"routeTo": "grok-assistant"
+			},
+			{
+				"if": "(free|budget|cheap|cost)",
+				"routeTo": "budget-assistant"
+			}
+		],
+		"fallback": "generalist-gpt"
+	},
+	"planner": {
+		"enabled": true,
+		"maxDepth": 3,
+		"parallelLimit": 2,
+		"defaultStrategy": "linear"
+	}
+}
