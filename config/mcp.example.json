@@ -1,0 +1,93 @@
+{
+	"servers": [
+		{
+			"name": "Filesystem MCP Server",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-filesystem",
+				"/path/to/directory"
+			],
+			"env": {},
+			"enabled": true,
+			"description": "Provides filesystem access to specified directory"
+		},
+		{
+			"name": "GitHub MCP Server",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-github"
+			],
+			"env": {
+				"GITHUB_TOKEN": "your_github_token_here"
+			},
+			"enabled": true,
+			"description": "GitHub integration for accessing repositories and issues"
+		},
+		{
+			"name": "PostgreSQL MCP Server",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-postgres"
+			],
+			"env": {
+				"POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
+			},
+			"enabled": false,
+			"description": "PostgreSQL database access"
+		},
+		{
+			"name": "Memory MCP Server",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-memory"
+			],
+			"env": {},
+			"enabled": true,
+			"description": "Persistent memory across conversations"
+		},
+		{
+			"name": "Brave Search MCP Server",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-brave-search"
+			],
+			"env": {
+				"BRAVE_API_KEY": "your_brave_api_key_here"
+			},
+			"enabled": false,
+			"description": "Web search capabilities using Brave Search API"
+		}
+	],
+	"settings": [
+		{
+			"key": "max_concurrent_servers",
+			"value": 5
+		},
+		{
+			"key": "default_timeout",
+			"value": 30000
+		},
+		{
+			"key": "auto_restart_on_failure",
+			"value": true
+		},
+		{
+			"key": "log_level",
+			"value": "info"
+		},
+		{
+			"key": "allowed_tools",
+			"value": [
+				"read_file",
+				"write_file",
+				"list_directory",
+				"search"
+			]
+		}
+	]
+}

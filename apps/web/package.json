@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@agent/shared": "workspace:*",
     "highlight.js": "^11.11.1",
     "next": "16.0.1",
     "react": "19.2.0",

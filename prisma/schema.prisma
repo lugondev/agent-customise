@@ -13,52 +13,95 @@ datasource db {
 // Run represents a plan execution session
 model Run {
   id        String   @id @default(cuid())
-  goal      String   // Original goal/query
-  planJson  String   // JSON serialized Plan
-  status    String   // pending | running | completed | failed
-  output    String?  // Final aggregated output
-  error     String?  // Error message if failed
+  goal      String // Original goal/query
+  planJson  String // JSON serialized Plan
+  status    String // pending | running | completed | failed
+  output    String? // Final aggregated output
+  error     String? // Error message if failed
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  steps     Step[]
-  messages  Message[]
+  steps    Step[]
+  messages Message[]
 
   @@map("runs")
 }
 
 // Step represents a single step in a plan execution
 model Step {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   runId       String
-  stepId      String   // Step ID from Plan (e.g., "step_123")
-  title       String   // Step title/description
-  status      String   // pending | running | completed | failed
-  inputJson   String   // JSON serialized inputs
-  outputJson  String?  // JSON serialized output
-  error       String?  // Error message if failed
+  stepId      String // Step ID from Plan (e.g., "step_123")
+  title       String // Step title/description
+  status      String // pending | running | completed | failed
+  inputJson   String // JSON serialized inputs
+  outputJson  String? // JSON serialized output
+  error       String? // Error message if failed
   startedAt   DateTime?
   completedAt DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
-  run         Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  run Run @relation(fields: [runId], references: [id], onDelete: Cascade)
 
-  @@map("steps")
   @@index([runId])
+  @@map("steps")
 }
 
 // Message represents chat messages during execution
 model Message {
   id        String   @id @default(cuid())
   runId     String
-  stepId    String?  // Optional: link to specific step
-  role      String   // system | user | assistant | tool
+  stepId    String? // Optional: link to specific step
+  role      String // system | user | assistant | tool
   content   String
   createdAt DateTime @default(now())
 
-  run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  run Run @relation(fields: [runId], references: [id], onDelete: Cascade)
 
-  @@map("messages")
   @@index([runId])
   @@index([stepId])
+  @@map("messages")
+}
+
+// McpServer represents MCP server configuration
+model McpServer {
+  id          String   @id @default(cuid())
+  name        String // Display name
+  command     String // Executable command
+  argsJson    String // JSON array of command arguments
+  envJson     String? // JSON object of environment variables
+  enabled     Boolean  @default(true)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([enabled])
+  @@map("mcp_servers")
+}
+
+// McpTool represents available tools from MCP servers
+model McpTool {
+  id          String   @id @default(cuid())
+  serverId    String // Reference to McpServer
+  name        String // Tool name
+  description String?
+  schemaJson  String // JSON schema of the tool
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([serverId])
+  @@index([enabled])
+  @@map("mcp_tools")
+}
+
+// McpSetting represents global MCP configuration
+model McpSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique // Setting key
+  value     String // Setting value (JSON)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("mcp_settings")
 }
