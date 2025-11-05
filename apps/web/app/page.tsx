@@ -5,6 +5,7 @@ import Link from 'next/link'
 import {ChatInterface} from '@/components/chat-interface'
 import {AgentSelector} from '@/components/agent-selector'
 import {ModelStats} from '@/components/model-stats'
+import McpStatusWidget from '@/components/mcp-status-widget'
 
 export default function Home() {
 	const [selectedAgent, setSelectedAgent] = useState<string | null>(null)
@@ -23,8 +24,9 @@ export default function Home() {
 				</header>
 
 				<div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
-					<div className='lg:col-span-3'>
+					<div className='lg:col-span-3 space-y-6'>
 						<AgentSelector selectedAgent={selectedAgent} onSelectAgent={setSelectedAgent} />
+						<McpStatusWidget />
 					</div>
 
 					<div className='lg:col-span-6'>

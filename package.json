@@ -5,6 +5,12 @@
   "scripts": {
     "build": "pnpm -r run build",
     "dev": "pnpm --filter @agent/apps-api dev",
+    "dev:api": "cd apps/api && PORT=3002 pnpm dev",
+    "dev:web": "cd apps/web && pnpm dev --port 3032",
+    "seed:mcp": "pnpm tsx prisma/seed-mcp.ts",
+    "test:mcp": "./scripts/test-mcp-api.sh",
+    "test:time": "./scripts/test-time-server.sh",
+    "build:time": "cd packages/mcp-servers/time-server && pnpm install && pnpm build",
     "lint": "echo 'No lint configured yet'",
     "test": "echo 'No tests yet'"
   },
@@ -21,6 +27,7 @@
   "devDependencies": {
     "@types/express": "^5.0.5",
     "@types/node": "^24.10.0",
-    "prisma": "^6.18.0"
+    "prisma": "^6.18.0",
+    "tsx": "^4.7.0"
   }
 }

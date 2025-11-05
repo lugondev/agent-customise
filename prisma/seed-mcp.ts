@@ -45,6 +45,21 @@ async function main() {
 
 	console.log('✅ Created GitHub MCP Server');
 
+	const timeServer = await prisma.mcpServer.create({
+		data: {
+			name: 'Time Server',
+			command: 'node',
+			argsJson: JSON.stringify([
+				'/Users/lugon/dev/2025-project-002/agent-customise/packages/mcp-servers/time-server/dist/index.js',
+			]),
+			envJson: null,
+			enabled: true,
+			description: 'Provides current time and timezone information to agents',
+		},
+	});
+
+	console.log('✅ Created Time MCP Server');
+
 	// Create sample tools
 	await prisma.mcpTool.create({
 		data: {
@@ -115,6 +130,91 @@ async function main() {
 	});
 
 	console.log('✅ Created memory tools');
+
+	await prisma.mcpTool.create({
+		data: {
+			serverId: timeServer.id,
+			name: 'get_current_time',
+			description: 'Get the current date and time in various formats',
+			schemaJson: JSON.stringify({
+				type: 'object',
+				properties: {
+					format: {
+						type: 'string',
+						enum: ['iso', 'locale', 'utc', 'date', 'time'],
+						description: 'Output format',
+					},
+					timezone: {
+						type: 'string',
+						description: 'IANA timezone name',
+					},
+				},
+			}),
+			enabled: true,
+		},
+	});
+
+	await prisma.mcpTool.create({
+		data: {
+			serverId: timeServer.id,
+			name: 'get_timestamp',
+			description: 'Get the current Unix timestamp',
+			schemaJson: JSON.stringify({
+				type: 'object',
+				properties: {
+					unit: {
+						type: 'string',
+						enum: ['seconds', 'milliseconds'],
+						description: 'Timestamp unit',
+					},
+				},
+			}),
+			enabled: true,
+		},
+	});
+
+	await prisma.mcpTool.create({
+		data: {
+			serverId: timeServer.id,
+			name: 'get_timezone',
+			description: 'Get information about the current timezone',
+			schemaJson: JSON.stringify({
+				type: 'object',
+				properties: {},
+			}),
+			enabled: true,
+		},
+	});
+
+	await prisma.mcpTool.create({
+		data: {
+			serverId: timeServer.id,
+			name: 'format_time',
+			description: 'Format a Unix timestamp to a readable string',
+			schemaJson: JSON.stringify({
+				type: 'object',
+				properties: {
+					timestamp: {
+						type: 'number',
+						description: 'Unix timestamp in milliseconds',
+					},
+					format: {
+						type: 'string',
+						enum: ['iso', 'locale', 'utc', 'date', 'time'],
+						description: 'Output format',
+					},
+					timezone: {
+						type: 'string',
+						description: 'IANA timezone name',
+					},
+				},
+				required: ['timestamp'],
+			}),
+			enabled: true,
+		},
+	});
+
+	console.log('✅ Created time server tools');
 
 	// Create sample settings
 	await prisma.mcpSetting.create({
