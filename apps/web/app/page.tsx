@@ -1,41 +1,39 @@
 'use client'
 
 import {useState} from 'react'
-import Link from 'next/link'
 import {ChatInterface} from '@/components/chat-interface'
 import {AgentSelector} from '@/components/agent-selector'
-import {ModelStats} from '@/components/model-stats'
+import ModelStats from '@/components/model-stats'
 import McpStatusWidget from '@/components/mcp-status-widget'
+import {Card} from '@/components/ui/card'
 
 export default function Home() {
 	const [selectedAgent, setSelectedAgent] = useState<string | null>(null)
 
 	return (
-		<div className='min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900'>
-			<div className='container mx-auto px-4 py-8'>
-				<header className='mb-8 flex items-center justify-between'>
-					<div>
-						<h1 className='text-4xl font-bold text-white mb-2'>Multi-Agent AI System</h1>
-						<p className='text-gray-400'>Powered by OpenRouter - GPT, Claude, Gemini, Grok, DeepSeek</p>
-					</div>
-					<Link href='/mcp' className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors'>
-						MCP Config
-					</Link>
-				</header>
+		<div className='container mx-auto h-[calc(100vh-4rem)] p-4'>
+			<div className='grid h-full gap-4 lg:grid-cols-[1fr_320px]'>
+				{/* Main Chat Area */}
+				<div className='flex flex-col gap-4'>
+					<ChatInterface selectedAgent={selectedAgent} />
+				</div>
 
-				<div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
-					<div className='lg:col-span-3 space-y-6'>
+				{/* Sidebar */}
+				<div className='flex flex-col gap-4 overflow-y-auto'>
+					<Card className='p-4'>
+						<h2 className='mb-4 text-lg font-semibold'>Agent Selection</h2>
 						<AgentSelector selectedAgent={selectedAgent} onSelectAgent={setSelectedAgent} />
+					</Card>
+
+					<Card className='p-4'>
+						<h2 className='mb-4 text-lg font-semibold'>MCP Status</h2>
 						<McpStatusWidget />
-					</div>
+					</Card>
 
-					<div className='lg:col-span-6'>
-						<ChatInterface selectedAgent={selectedAgent} />
-					</div>
-
-					<div className='lg:col-span-3'>
+					<Card className='p-4'>
+						<h2 className='mb-4 text-lg font-semibold'>Model Statistics</h2>
 						<ModelStats />
-					</div>
+					</Card>
 				</div>
 			</div>
 		</div>

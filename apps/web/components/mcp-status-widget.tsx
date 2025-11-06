@@ -3,6 +3,11 @@
 import {useState, useEffect} from 'react'
 import {McpServer} from '@agent/shared'
 import {getAllMcpServers, getEnabledMcpServers} from '@/lib/api/mcp-api'
+import {Badge} from '@/components/ui/badge'
+import {Button} from '@/components/ui/button'
+import {Skeleton} from '@/components/ui/skeleton'
+import {Shield, ChevronDown, ChevronUp, Circle} from 'lucide-react'
+import {cn} from '@/lib/utils'
 
 interface McpStats {
 	total: number
@@ -11,14 +16,17 @@ interface McpStats {
 }
 
 export default function McpStatusWidget() {
-	const [stats, setStats] = useState<McpStats>({total: 0, enabled: 0, disabled: 0})
+	const [stats, setStats] = useState<McpStats>({
+		total: 0,
+		enabled: 0,
+		disabled: 0,
+	})
 	const [servers, setServers] = useState<McpServer[]>([])
 	const [loading, setLoading] = useState(true)
 	const [showDetails, setShowDetails] = useState(false)
 
 	useEffect(() => {
 		loadStats()
-		// Refresh every 30 seconds
 		const interval = setInterval(loadStats, 30000)
 		return () => clearInterval(interval)
 	}, [])
@@ -42,72 +50,63 @@ export default function McpStatusWidget() {
 
 	if (loading) {
 		return (
-			<div className='bg-white rounded-lg shadow p-4'>
-				<div className='animate-pulse'>
-					<div className='h-4 bg-gray-200 rounded w-1/2 mb-4'></div>
-					<div className='space-y-2'>
-						<div className='h-3 bg-gray-200 rounded'></div>
-						<div className='h-3 bg-gray-200 rounded w-5/6'></div>
-					</div>
-				</div>
+			<div className='space-y-3'>
+				<Skeleton className='h-4 w-full' />
+				<Skeleton className='h-4 w-3/4' />
 			</div>
 		)
 	}
 
+	const isOnline = stats.enabled > 0
+
 	return (
-		<div className='bg-white rounded-lg shadow'>
-			<div className='p-4 border-b border-gray-200'>
-				<div className='flex items-center justify-between'>
-					<h3 className='text-lg font-semibold text-gray-900'>MCP Status</h3>
-					<button onClick={() => setShowDetails(!showDetails)} className='text-sm text-blue-600 hover:text-blue-700'>
-						{showDetails ? 'Hide' : 'Show'} Details
-					</button>
+		<div className='space-y-4'>
+			<Button variant='ghost' className='w-full justify-between p-0 h-auto hover:bg-transparent' onClick={() => setShowDetails(!showDetails)}>
+				<div className='flex items-center gap-2'>
+					<Shield className='h-4 w-4 text-muted-foreground' />
+					<span className='text-sm font-medium'>MCP Servers</span>
 				</div>
-			</div>
-
-			<div className='p-4 space-y-3'>
-				{/* Stats Grid */}
-				<div className='grid grid-cols-3 gap-4'>
-					<div className='text-center'>
-						<div className='text-2xl font-bold text-gray-900'>{stats.total}</div>
-						<div className='text-xs text-gray-500'>Total Servers</div>
-					</div>
-					<div className='text-center'>
-						<div className='text-2xl font-bold text-green-600'>{stats.enabled}</div>
-						<div className='text-xs text-gray-500'>Enabled</div>
-					</div>
-					<div className='text-center'>
-						<div className='text-2xl font-bold text-gray-400'>{stats.disabled}</div>
-						<div className='text-xs text-gray-500'>Disabled</div>
-					</div>
+				<div className='flex items-center gap-2'>
+					<Badge variant={isOnline ? 'success' : 'secondary'} className='gap-1'>
+						<Circle className={cn('h-2 w-2 fill-current', isOnline && 'animate-pulse')} />
+						{isOnline ? 'Online' : 'Offline'}
+					</Badge>
+					{showDetails ? <ChevronUp className='h-4 w-4' /> : <ChevronDown className='h-4 w-4' />}
 				</div>
+			</Button>
 
-				{/* Status Indicator */}
-				<div className='flex items-center gap-2 pt-2'>
-					<div className={`w-2 h-2 rounded-full ${stats.enabled > 0 ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
-					<span className='text-sm text-gray-600'>{stats.enabled > 0 ? `${stats.enabled} server${stats.enabled > 1 ? 's' : ''} active` : 'No active servers'}</span>
-				</div>
-
-				{/* Server List (when details shown) */}
-				{showDetails && servers.length > 0 && (
-					<div className='mt-4 pt-4 border-t border-gray-200'>
-						<div className='space-y-2'>
-							{servers.map((server) => (
-								<div key={server.id} className='flex items-center justify-between text-sm py-2'>
-									<div className='flex items-center gap-2'>
-										<div className={`w-2 h-2 rounded-full ${server.enabled ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-										<span className='text-gray-700 font-medium'>{server.name}</span>
-									</div>
-									<span className={`px-2 py-1 text-xs rounded-full ${server.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{server.enabled ? 'Active' : 'Inactive'}</span>
-								</div>
-							))}
+			{showDetails && (
+				<div className='space-y-3'>
+					<div className='grid grid-cols-3 gap-3 text-center'>
+						<div className='space-y-1'>
+							<p className='text-2xl font-bold'>{stats.total}</p>
+							<p className='text-xs text-muted-foreground'>Total</p>
+						</div>
+						<div className='space-y-1'>
+							<p className='text-2xl font-bold text-green-600 dark:text-green-400'>{stats.enabled}</p>
+							<p className='text-xs text-muted-foreground'>Enabled</p>
+						</div>
+						<div className='space-y-1'>
+							<p className='text-2xl font-bold text-muted-foreground'>{stats.disabled}</p>
+							<p className='text-xs text-muted-foreground'>Disabled</p>
 						</div>
 					</div>
-				)}
 
-				{/* Empty State */}
-				{servers.length === 0 && <div className='text-center py-4 text-sm text-gray-500'>No MCP servers configured</div>}
-			</div>
+					<div className='space-y-2 max-h-40 overflow-y-auto'>
+						{servers.map((server) => (
+							<div key={server.id} className='flex items-center justify-between rounded-lg border p-2'>
+								<div className='flex items-center gap-2'>
+									<Circle className={cn('h-2 w-2 fill-current', server.enabled ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground')} />
+									<span className='text-sm'>{server.name}</span>
+								</div>
+								<Badge variant={server.enabled ? 'success' : 'secondary'} className='text-xs'>
+									{server.enabled ? 'Active' : 'Inactive'}
+								</Badge>
+							</div>
+						))}
+					</div>
+				</div>
+			)}
 		</div>
 	)
 }
